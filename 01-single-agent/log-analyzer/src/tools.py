@@ -4,14 +4,17 @@ from pathlib import Path
 from langchain_core.tools import tool
 
 TOOLS_DIR = Path(__file__).resolve().parent
-LOG_DIR = (TOOLS_DIR / "../test-logs").resolve()
+TEST_LOG_DIR = (TOOLS_DIR / "../test-logs").resolve()
+
+LOG_DIR = Path("/var/log").resolve()
 
 def safe_load(filename: str) -> Path:
-    """Load a log file from the tools directory."""
+    """Load a log file from the system log directory."""
     file = (LOG_DIR / filename).resolve()
     if LOG_DIR not in file.parents or not file.is_file():
         raise ValueError(f"File {file} not in {LOG_DIR}.")
-    return file
+    else:
+        return file
 
 @tool
 def read_log_chunk(filename: str, start: int = 50, n_lines: int = 200) -> List[str]:
@@ -57,11 +60,8 @@ def count_by_level(filename:str) -> str:
     with open(path, 'r') as f:
         for line in f:
             low = line.lower()
-            if "fail" in low or "failed" in low:
-                counts["FAIL"] += 1
-            elif "warning" in low:
-                counts["WARNING"] += 1
-            elif "info" in low:
-                counts["INFO"] += 1
+            for k in counts:
+                if k in low:
+                    counts[k] += 1
 
     return str(counts)
