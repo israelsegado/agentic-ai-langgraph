@@ -7,7 +7,7 @@ from langchain.agents.structured_output import ToolStrategy
 
 from src.schemas import Report
 from src.tools import read_log_chunk, search_pattern, count_by_level
-from src.config import SYSTEM_PROMPT, LLM_MODEL
+from src.config import SYSTEM_PROMPT, LLM_MODEL, AGENT_PROMPT
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ-API-KEY")
@@ -27,8 +27,12 @@ agent = create_agent(
     response_format=ToolStrategy(Report)
 )
 
-result = agent.invoke(
-    ({"messages": [{"role": "user", "content": "Make a report about the file 'data.log' inside the `test-logs` folder"}]})
-)
+user_input = input("Write the files that you want to check or extra information prompt: ")
 
-print(result["structured_response"])
+try:
+    result = agent.invoke(
+        ({"messages": [{"role": "user", "content": user_input+AGENT_PROMPT}]})
+    )
+    print(result["structured_response"])
+except Exception as e:
+    print(f"ERROR: {e}")
