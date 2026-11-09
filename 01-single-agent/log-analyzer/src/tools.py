@@ -1,10 +1,13 @@
 import re
+import os
 from typing import List
 from pathlib import Path
 from langchain_core.tools import tool
 
 TOOLS_DIR = Path(__file__).resolve().parent
 TEST_LOG_DIR = (TOOLS_DIR / "../test-logs").resolve()
+
+os.makedirs(TEST_LOG_DIR, exist_ok=True)
 
 LOG_DIR = Path("/var/log").resolve()
 
